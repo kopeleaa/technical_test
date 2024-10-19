@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.util.List;
 
@@ -28,8 +29,12 @@ public class Person {
     //Set?
     @OneToMany(mappedBy = "person", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @Size(max = 2)
+    @JsonManagedReference
+    @ToString.Exclude
     private List<Address> addresses;
 
     @OneToMany(mappedBy = "person", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @JsonManagedReference
+    @ToString.Exclude
     private List<ContactInformation> contactInformationList;
 }
