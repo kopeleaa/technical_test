@@ -1,5 +1,6 @@
 package com.example.technical_test.exception.handler;
 
+import com.example.technical_test.exception.AddressNotFoundByIdException;
 import com.example.technical_test.exception.NoEntriesFoundException;
 import com.example.technical_test.exception.PersonAlreadyExistsException;
 import com.example.technical_test.exception.PersonNotFoundByIdException;
@@ -25,7 +26,7 @@ public class GlobalExceptionHandler {
     public List<ValidationError> handleMethodArgumentNotValidException(MethodArgumentNotValidException exception) {
         List<ValidationError> validationErrors = exception.getBindingResult().getFieldErrors()
                 .stream().map(fieldError -> new ValidationError(fieldError.getField(), fieldError.getDefaultMessage()))
-                .collect(Collectors.toList());
+                .toList();
 
         validationErrors.forEach(validationError -> logValidationError(validationError.field(), validationError.errorMessage()));
 
@@ -37,7 +38,7 @@ public class GlobalExceptionHandler {
     public List<ValidationError> handleConstraintViolationException(ConstraintViolationException exception) {
         List<ValidationError> validationErrors = exception.getConstraintViolations()
                 .stream().map(violation -> new ValidationError(violation.getPropertyPath().toString(), violation.getMessage()))
-                .collect(Collectors.toList());
+                .toList();
 
         validationErrors.forEach(validationError -> logValidationError(validationError.field(), validationError.errorMessage()));
 
@@ -62,6 +63,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(PersonNotFoundByIdException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ValidationError handlePersonNotFoundByIdException(PersonNotFoundByIdException exception) {
+        ValidationError validationError = new ValidationError("id", exception.getMessage());
+        logValidationError(validationError.field(), validationError.errorMessage());
+        return validationError;
+    }
+
+    @ExceptionHandler(AddressNotFoundByIdException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ValidationError handleAddressNotFoundByIdException(AddressNotFoundByIdException exception) {
         ValidationError validationError = new ValidationError("id", exception.getMessage());
         logValidationError(validationError.field(), validationError.errorMessage());
         return validationError;

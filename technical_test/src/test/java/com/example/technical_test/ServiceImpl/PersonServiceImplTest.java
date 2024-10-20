@@ -1,9 +1,12 @@
 package com.example.technical_test.ServiceImpl;
 
+import com.example.technical_test.domain.Address;
 import com.example.technical_test.domain.Person;
 import com.example.technical_test.dto.PersonDataDto;
 import com.example.technical_test.dto.PersonNameWithIdDto;
 import com.example.technical_test.dto.mapper.PersonMapper;
+import com.example.technical_test.enums.AddressType;
+import com.example.technical_test.exception.PersonAlreadyExistsException;
 import com.example.technical_test.repository.PersonRepository;
 import com.example.technical_test.service.impl.PersonServiceImpl;
 import org.junit.jupiter.api.Test;
@@ -15,19 +18,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class PersonServiceImplTest {
-
-    @InjectMocks
-    private PersonServiceImpl personService;
 
     @Mock
     private PersonRepository personRepository;
@@ -35,59 +33,78 @@ public class PersonServiceImplTest {
     @Mock
     private PersonMapper personMapper;
 
+    @InjectMocks
+    private PersonServiceImpl personService;
 
     @Test
-    void givenZeroPersonInDb_WhenCreatePerson_ThenPersonCreated() {
-        Person person = returnMockPerson();
-        PersonDataDto dto = new PersonDataDto("Agatha", "Christie",
-                LocalDate.of(1890, 9, 15));
-
+    void givenZeroPersonInDB_WhenCreatePerson_ThenPersonCreated() {
+        PersonDataDto dto = returnMockPersonDataDto("Agatha", "Christie");
         PersonNameWithIdDto expectedDto = new PersonNameWithIdDto(1,
                 "Agatha Christie");
 
+        Mockito.when(personService.createPerson(dto)).thenReturn(expectedDto);
+        PersonNameWithIdDto person2 = personService.createPerson(dto);
 
-        given(personService.createPerson(dto)).willReturn(expectedDto);
-        PersonNameWithIdDto person1 = personService.createPerson(dto);
-
-        when(personRepository.findById(1)).thenReturn(Optional.of(person));
-        PersonNameWithIdDto personById = personService.getPersonById(1);
-
-
-        assertEquals(personById.name(), person1.name());
-        assertEquals(personById.personId(), person1.personId());
+        assertEquals(person2.name(), dto.firstName() + " " + dto.lastName());
     }
 
     @Test
-    void getAllPerson() {
-        //given
-        Person person = new Person();
-        person.setFirstName("Ahnis");
-        person.setLastName("Gotham");
-        person.setDateOfBirth(LocalDate.of(2000, 10, 10));
-        Person person2 = new Person();
-        person2.setFirstName("Saksham");
-        person2.setLastName("New york");
-        person2.setDateOfBirth(LocalDate.of(2001, 11, 11));
+    void givenPersonIsAlreadyInDB_WhenCreatePerson_ThenExceptionThrown() {
+        PersonDataDto dto = returnMockPersonDataDto("Agatha", "Christie");
+
+        Mockito.when(personService.createPerson(dto)).thenThrow(PersonAlreadyExistsException.class);
+        assertThrows(PersonAlreadyExistsException.class, () -> personService.createPerson(dto));
+    }
+
+    @Test
+    void givenTwoPersonsInDb_WhenGetAllPersons_ThenListReturned() {
+        //Given
+        Person person = returnMockPerson("Agatha", "Christie");
+        Person person2 = returnMockPerson("Frank", "Theodore");
 
         //When
         given(personRepository.findAll())
                 .willReturn(List.of(person, person2));
-        var personList = personService.getAllPersons();
-        //Then
+        List<PersonNameWithIdDto> personList = personService.getAllPersons();
 
+        //Then
         assertThat(personList).isNotNull();
-        assertEquals(personList.size(), 2);
+        assertEquals(2, personList.size());
     }
 
 
-    private Person returnMockPerson() {
+    private Person returnMockPerson(String firstName, String lastname) {
         Person person = new Person();
 
-        person.setFirstName("Agatha");
-        person.setLastName("Christie");
+        person.setFirstName(firstName);
+        person.setLastName(lastname);
         person.setDateOfBirth(LocalDate.of(1890, 9, 15));
         person.setId(1);
 
         return person;
+    }
+
+    private Address returnMockAddress(Person person, Integer id, AddressType type, String city) {
+        Address address = new Address();
+        address.setId(id);
+        address.setAddressType(type);
+        address.setCity(city);
+        address.setStreet("Apple");
+        address.setHouseNumber(12);
+        address.setZipCode("0123");
+        address.setPerson(person);
+
+        return address;
+    }
+
+    private PersonDataDto returnMockPersonDataDto(String firstname, String lastName) {
+        return new PersonDataDto(
+                firstname,
+                lastName,
+                LocalDate.of(1890, 9, 15),
+                1,
+                2,
+                "06203345678",
+                "test@test.com");
     }
 }

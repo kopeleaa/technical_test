@@ -43,6 +43,8 @@ public class PersonServiceImpl implements PersonService {
         person.setLastName(requestBody.lastName());
         person.setDateOfBirth(requestBody.dateOfBirth());
 
+        //TODO: addressList, contactInformationList
+
         return personMapper.entityToPersonDataDto(personRepository.save(person));
     }
 
@@ -81,6 +83,7 @@ public class PersonServiceImpl implements PersonService {
 
         return personFromRepo.get();
     }
+
 
 
 }
