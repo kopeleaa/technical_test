@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @Slf4j
@@ -17,16 +19,31 @@ public class PersonControllerImpl implements PersonController {
 
     @Override
     public PersonNameWithIdDto createPerson(PersonDataDto requestBody) {
+        log.info("HTTP request received: POST /person {}", requestBody);
         return personService.createPerson(requestBody);
     }
 
     @Override
     public PersonDataDto updatePersonById(PersonDataDto requestBody, Integer id) {
+        log.info("HTTP request received: PUT /person/{} , {}", id, requestBody);
         return personService.updatePersonById(requestBody, id);
     }
 
     @Override
     public PersonNameWithIdDto getPersonById(Integer id) {
+        log.info("HTTP request received: GET /person/{}", id);
         return personService.getPersonById(id);
+    }
+
+    @Override
+    public List<PersonNameWithIdDto> getAllPersons() {
+        log.info("HTTP request received: GET /person");
+        return personService.getAllPersons();
+    }
+
+    @Override
+    public void deletePerson(Integer id) {
+        log.info("HTTP request received: DELETE /person/{}", id);
+        personService.deletePerson(id);
     }
 }

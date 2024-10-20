@@ -3,10 +3,16 @@ package com.example.technical_test.service;
 import com.example.technical_test.dto.PersonDataDto;
 import com.example.technical_test.dto.PersonNameWithIdDto;
 
+import java.util.List;
+
 public interface PersonService {
     PersonNameWithIdDto createPerson(PersonDataDto requestBody);
 
     PersonDataDto updatePersonById(PersonDataDto requestBody, Integer id);
 
     PersonNameWithIdDto getPersonById(Integer id);
+
+    List<PersonNameWithIdDto> getAllPersons();
+
+    void deletePerson(Integer id);
 }

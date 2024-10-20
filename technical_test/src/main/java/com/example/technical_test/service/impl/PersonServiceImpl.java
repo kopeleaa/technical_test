@@ -4,6 +4,7 @@ import com.example.technical_test.domain.Person;
 import com.example.technical_test.dto.PersonDataDto;
 import com.example.technical_test.dto.PersonNameWithIdDto;
 import com.example.technical_test.dto.mapper.PersonMapper;
+import com.example.technical_test.exception.handler.NoEntriesFoundException;
 import com.example.technical_test.exception.handler.PersonAlreadyExistsException;
 import com.example.technical_test.exception.handler.PersonNotFoundByIdException;
 import com.example.technical_test.repository.PersonRepository;
@@ -11,7 +12,9 @@ import com.example.technical_test.service.PersonService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -22,7 +25,8 @@ public class PersonServiceImpl implements PersonService {
 
     @Override
     public PersonNameWithIdDto createPerson(PersonDataDto requestBody) {
-        Optional<Person> personFromRepo = personRepository.findByNameAndDateOfBirth(requestBody.firstName(), requestBody.lastName(), requestBody.dateOfBirth());
+        Optional<Person> personFromRepo = personRepository
+                .findByNameAndDateOfBirth(requestBody.firstName(), requestBody.lastName(), requestBody.dateOfBirth());
 
         if (personFromRepo.isPresent()) {
             throw new PersonAlreadyExistsException(requestBody.firstName() + " " + requestBody.lastName());
@@ -47,6 +51,26 @@ public class PersonServiceImpl implements PersonService {
     public PersonNameWithIdDto getPersonById(Integer id) {
         Person person = getPersonFromRepoById(id);
         return personMapper.entityToDto(person);
+    }
+
+    @Override
+    public List<PersonNameWithIdDto> getAllPersons() {
+        List<Person> people = personRepository.findAll();
+
+        if (people.isEmpty()) {
+            throw new NoEntriesFoundException();
+        }
+
+        return people.stream().map(personMapper::entityToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void deletePerson(Integer id) {
+        Person personToDelete = personRepository.findById(id)
+                .orElseThrow(() -> new PersonNotFoundByIdException(id));
+
+        personRepository.delete(personToDelete);
     }
 
     private Person getPersonFromRepoById(Integer id) {
