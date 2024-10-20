@@ -1,9 +1,6 @@
 package com.example.technical_test.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Past;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Builder;
 
 import java.time.LocalDate;
@@ -17,6 +14,12 @@ public record PersonDataDto(
         @NotBlank(message = "Field cannot be empty")
         @Size(min = 2, message = "Minimum length: 2") String lastName,
         @NotNull(message = "Field cannot be null")
-        @Past(message = "Date must be in the past") LocalDate dateOfBirth
+        @Past(message = "Date must be in the past") LocalDate dateOfBirth,
+        @NotNull(message = "Field cannot be null")
+        @NotBlank(message = "Field cannot be empty") Integer permanentAddressId,
+        @NotNull(message = "Field cannot be null")
+        @NotBlank(message = "Field cannot be empty") Integer temporaryAddressId,
+        String phoneNumber,
+        @Email String email
 ) {
 }

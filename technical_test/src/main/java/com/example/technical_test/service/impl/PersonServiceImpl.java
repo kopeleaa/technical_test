@@ -4,9 +4,9 @@ import com.example.technical_test.domain.Person;
 import com.example.technical_test.dto.PersonDataDto;
 import com.example.technical_test.dto.PersonNameWithIdDto;
 import com.example.technical_test.dto.mapper.PersonMapper;
-import com.example.technical_test.exception.handler.NoEntriesFoundException;
-import com.example.technical_test.exception.handler.PersonAlreadyExistsException;
-import com.example.technical_test.exception.handler.PersonNotFoundByIdException;
+import com.example.technical_test.exception.NoEntriesFoundException;
+import com.example.technical_test.exception.PersonAlreadyExistsException;
+import com.example.technical_test.exception.PersonNotFoundByIdException;
 import com.example.technical_test.repository.PersonRepository;
 import com.example.technical_test.service.PersonService;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -62,7 +61,7 @@ public class PersonServiceImpl implements PersonService {
         }
 
         return people.stream().map(personMapper::entityToDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override

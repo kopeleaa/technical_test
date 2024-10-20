@@ -1,4 +1,4 @@
-package com.example.technical_test.exception.handler;
+package com.example.technical_test.exception;
 
 public class PersonNotFoundByIdException extends RuntimeException {
     public PersonNotFoundByIdException(Integer id) {

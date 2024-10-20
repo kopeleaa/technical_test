@@ -29,7 +29,7 @@ public class Address {
     @Column(name = "house_number")
     private Integer houseNumber;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "person_id", nullable = false)
     @JsonBackReference
     private Person person;
