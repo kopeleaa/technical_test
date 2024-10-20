@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -26,7 +27,10 @@ public class Person {
     @Column(name = "last_name")
     private String lastName;
 
-    //Set?
+    @Column(name = "date_of_birth")
+    private LocalDate dateOfBirth;
+
+    //Set?, manyToMany
     @OneToMany(mappedBy = "person", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @Size(max = 2)
     @JsonManagedReference
