@@ -68,10 +68,10 @@ public class PersonServiceImpl implements PersonService {
 
     @Override
     public void deletePerson(Integer id) {
-        Person personToDelete = personRepository.findById(id)
+        Person person = personRepository.findById(id)
                 .orElseThrow(() -> new PersonNotFoundByIdException(id));
 
-        personRepository.delete(personToDelete);
+        personRepository.delete(person);
     }
 
     private Person getPersonFromRepoById(Integer id) {
