@@ -25,4 +25,10 @@ public class AddressServiceImpl implements AddressService {
         }
         return addressFromRepo.get();
     }
+
+    @Override
+    public void saveAddress(Address address) {
+
+
+    }
 }

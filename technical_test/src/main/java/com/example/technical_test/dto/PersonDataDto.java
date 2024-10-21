@@ -14,10 +14,6 @@ public record PersonDataDto(
         @NotBlank(message = "Field cannot be empty")
         @Size(min = 2, message = "Minimum length: 2") String lastName,
         @NotNull(message = "Field cannot be null")
-        @Past(message = "Date must be in the past") LocalDate dateOfBirth,
-        Integer permanentAddressId,
-        Integer temporaryAddressId,
-        String phoneNumber,
-        @Email String email
+        @Past(message = "Date must be in the past") LocalDate dateOfBirth
 ) {
 }

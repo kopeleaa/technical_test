@@ -2,17 +2,16 @@ package com.example.technical_test.domain;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "person")
-@NoArgsConstructor
+//@NoArgsConstructor
 @Data
 public class Person {
 
@@ -30,14 +29,27 @@ public class Person {
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
 
-    @OneToMany(mappedBy = "person", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    @Size(max = 2)
-    @JsonManagedReference
-    @ToString.Exclude
-    private List<Address> addresses;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "permanent_address")
+    private Address permanentAddress;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "temporary_address")
+    private Address temporaryAddress;
+
 
     @OneToMany(mappedBy = "person", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JsonManagedReference
     @ToString.Exclude
     private List<ContactInformation> contactInformationList;
+
+    public Person() {
+        this.contactInformationList = new ArrayList<>();
+    }
+
+    public void addContactInformation(ContactInformation contactInformation) {
+        if (!this.contactInformationList.contains(contactInformation)) {
+            this.contactInformationList.add(contactInformation);
+        }
+    }
 }

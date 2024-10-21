@@ -3,7 +3,9 @@ package com.example.technical_test.controller.impl;
 import com.example.technical_test.controller.PersonController;
 import com.example.technical_test.dto.PersonDataDto;
 import com.example.technical_test.dto.PersonNameWithIdDto;
+import com.example.technical_test.dto.PersonUpdateDto;
 import com.example.technical_test.service.PersonService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,7 +26,7 @@ public class PersonControllerImpl implements PersonController {
     }
 
     @Override
-    public PersonDataDto updatePersonById(PersonDataDto requestBody, Integer id) {
+    public PersonDataDto updatePersonById(@Valid PersonUpdateDto requestBody, Integer id) {
         log.info("HTTP request received: PUT /person/{} , {}", id, requestBody);
         return personService.updatePersonById(requestBody, id);
     }

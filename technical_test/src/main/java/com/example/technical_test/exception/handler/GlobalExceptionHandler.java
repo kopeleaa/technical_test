@@ -1,9 +1,6 @@
 package com.example.technical_test.exception.handler;
 
-import com.example.technical_test.exception.AddressNotFoundByIdException;
-import com.example.technical_test.exception.NoEntriesFoundException;
-import com.example.technical_test.exception.PersonAlreadyExistsException;
-import com.example.technical_test.exception.PersonNotFoundByIdException;
+import com.example.technical_test.exception.*;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -75,6 +72,15 @@ public class GlobalExceptionHandler {
         logValidationError(validationError.field(), validationError.errorMessage());
         return validationError;
     }
+
+    @ExceptionHandler(ContactInformationNotFoundByValueException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ValidationError handleContactInformationNotFoundByValueException(ContactInformationNotFoundByValueException exception) {
+        ValidationError validationError = new ValidationError("value", exception.getMessage());
+        logValidationError(validationError.field(), validationError.errorMessage());
+        return validationError;
+    }
+
 
     private void logValidationError(String field, String message) {
         log.error(VALIDATION_ERROR_MESSAGE, field, message);

@@ -1,13 +1,19 @@
 package com.example.technical_test.service.impl;
 
+import com.example.technical_test.domain.Address;
+import com.example.technical_test.domain.ContactInformation;
 import com.example.technical_test.domain.Person;
 import com.example.technical_test.dto.PersonDataDto;
 import com.example.technical_test.dto.PersonNameWithIdDto;
+import com.example.technical_test.dto.PersonUpdateDto;
 import com.example.technical_test.dto.mapper.PersonMapper;
+import com.example.technical_test.enums.ContactInformationType;
 import com.example.technical_test.exception.NoEntriesFoundException;
 import com.example.technical_test.exception.PersonAlreadyExistsException;
 import com.example.technical_test.exception.PersonNotFoundByIdException;
 import com.example.technical_test.repository.PersonRepository;
+import com.example.technical_test.service.AddressService;
+import com.example.technical_test.service.ContactInformationService;
 import com.example.technical_test.service.PersonService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,6 +27,8 @@ public class PersonServiceImpl implements PersonService {
 
     private final PersonRepository personRepository;
     private final PersonMapper personMapper;
+    private final AddressService addressService;
+    private final ContactInformationService contactInformationService;
 
     @Override
     public PersonNameWithIdDto createPerson(PersonDataDto requestBody) {
@@ -31,19 +39,43 @@ public class PersonServiceImpl implements PersonService {
             throw new PersonAlreadyExistsException(requestBody.firstName() + " " + requestBody.lastName());
         }
 
-        Person person = personMapper.dtoToEntity(requestBody);
-        return personMapper.entityToDto(personRepository.save(person));
-    }
-
-    @Override
-    public PersonDataDto updatePersonById(PersonDataDto requestBody, Integer id) {
-        Person person = getPersonFromRepoById(id);
+        Person person = personMapper.personDataDtoToEntity(requestBody);
 
         person.setFirstName(requestBody.firstName());
         person.setLastName(requestBody.lastName());
         person.setDateOfBirth(requestBody.dateOfBirth());
 
-        //TODO: addressList, contactInformationList
+        return personMapper.personNameWithIdDto(personRepository.save(person));
+    }
+
+    @Override
+    public PersonDataDto updatePersonById(PersonUpdateDto requestBody, Integer id) {
+        Person person = personRepository.findById(id).orElseThrow(() -> new PersonNotFoundByIdException(id));
+        Address permAddress = addressService.getAddressById(requestBody.permanentAddressId());
+        Address tempAddress = addressService.getAddressById(requestBody.temporaryAddressId());
+        ContactInformation phone = new ContactInformation();
+        phone.setContactInformationValue(requestBody.phoneNumber());
+        phone.setType(ContactInformationType.PHONE_NUMBER);
+        ContactInformation email = new ContactInformation();
+        email.setContactInformationValue(requestBody.email());
+        email.setType(ContactInformationType.EMAIL_ADDRESS);
+
+        permAddress.setPerson(person);
+        addressService.saveAddress(permAddress);
+        tempAddress.setPerson(person);
+        addressService.saveAddress(tempAddress);
+        phone.setPerson(person);
+        contactInformationService.saveContactInformation(phone);
+        email.setPerson(person);
+        contactInformationService.saveContactInformation(email);
+
+        person.setFirstName(requestBody.firstName());
+        person.setLastName(requestBody.lastName());
+        person.setDateOfBirth(requestBody.dateOfBirth());
+        person.setPermanentAddress(permAddress);
+        person.setTemporaryAddress(tempAddress);
+        person.addContactInformation(phone);
+        person.addContactInformation(email);
 
         return personMapper.entityToPersonDataDto(personRepository.save(person));
     }
@@ -51,7 +83,7 @@ public class PersonServiceImpl implements PersonService {
     @Override
     public PersonNameWithIdDto getPersonById(Integer id) {
         Person person = getPersonFromRepoById(id);
-        return personMapper.entityToDto(person);
+        return personMapper.personNameWithIdDto(person);
     }
 
     @Override
@@ -62,7 +94,7 @@ public class PersonServiceImpl implements PersonService {
             throw new NoEntriesFoundException();
         }
 
-        return people.stream().map(personMapper::entityToDto)
+        return people.stream().map(personMapper::personNameWithIdDto)
                 .toList();
     }
 
