@@ -1,12 +1,15 @@
 package com.example.technical_test.dto;
 
 import com.example.technical_test.enums.AddressType;
+import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 
+@Builder
 public record AddressDto(
-        String zipCode,
-        String city,
-        String street,
-        Integer houseNumber,
-        AddressType addressType
+        @NotNull String zipCode,
+        @NotNull String city,
+        @NotNull String street,
+        @NotNull Integer houseNumber,
+        @NotNull AddressType addressType
 ) {
 }

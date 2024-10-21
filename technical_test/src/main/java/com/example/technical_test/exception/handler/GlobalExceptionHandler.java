@@ -49,6 +49,13 @@ public class GlobalExceptionHandler {
         return exception.getMessage();
     }
 
+    @ExceptionHandler(AddressAlreadyExistsException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleAddressAlreadyExistsException(AddressAlreadyExistsException exception) {
+        log.error(exception.getMessage());
+        return exception.getMessage();
+    }
+
     @ExceptionHandler(PersonAlreadyExistsException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ValidationError handlerPersonAlreadyExistsException(PersonAlreadyExistsException exception) {
