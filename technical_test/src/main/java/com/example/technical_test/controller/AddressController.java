@@ -16,6 +16,9 @@ public interface AddressController {
     @PutMapping("/{id}")
     AddressDto updateAddress(@PathVariable Integer id, @RequestBody AddressDto requestBody);
 
+    @PutMapping("/{permAddressId}/{tempAddressId}/{personId}")
+    void connectAddressToPerson(@PathVariable Integer permAddressId, @PathVariable Integer tempAddressId, @PathVariable Integer personId);
+
     @GetMapping("/{id}")
     AddressDto getAddressById(@PathVariable Integer id);
 

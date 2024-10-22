@@ -29,6 +29,12 @@ public class AddressControllerImpl implements AddressController {
     }
 
     @Override
+    public void connectAddressToPerson(Integer permAddressId, Integer tempAddressId, Integer personId) {
+        log.info("HTTP request received: PUT /address/{}/{}/{}",permAddressId, tempAddressId, personId);
+        addressService.connectAddressToPerson(permAddressId, tempAddressId, personId);
+    }
+
+    @Override
     public AddressDto getAddressById(Integer id) {
         log.info("HTTP request received: GET /address/{}", id);
         return addressService.getAddressById(id);

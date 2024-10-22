@@ -20,4 +20,6 @@ public interface AddressService {
     List<AddressDto> getAllAddresses();
 
     void deleteAddressById(Integer id);
+
+    void connectAddressToPerson(Integer permAddressId, Integer tempAddressId, Integer personId);
 }

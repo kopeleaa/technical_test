@@ -3,9 +3,11 @@ package com.example.technical_test.dto.mapper;
 import com.example.technical_test.domain.Person;
 import com.example.technical_test.dto.PersonDataDto;
 import com.example.technical_test.dto.PersonNameWithIdDto;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class PersonMapper {
 
 
@@ -32,6 +34,7 @@ public class PersonMapper {
                 .dateOfBirth(person.getDateOfBirth())
                 .build();
     }
+
 
 
 }

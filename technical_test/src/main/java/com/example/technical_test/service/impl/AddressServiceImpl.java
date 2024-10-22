@@ -74,6 +74,18 @@ public class AddressServiceImpl implements AddressService {
     }
 
     @Override
+    public void connectAddressToPerson(Integer permAddressId, Integer tempAddressId, Integer personId) {
+        Address permanentAddress = findAddressById(permAddressId);
+        Address temporaryAddress = findAddressById(tempAddressId);
+        Person personFromRepo = personService.findPersonFromRepoById(personId);
+
+        personFromRepo.setPermanentAddress(permanentAddress);
+        personFromRepo.setTemporaryAddress(temporaryAddress);
+
+        personService.savePerson(personFromRepo);
+    }
+
+    @Override
     public Address findAddressById(Integer id) {
         Optional<Address> addressFromRepo = addressRepository.findById(id);
 

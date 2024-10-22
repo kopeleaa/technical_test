@@ -3,7 +3,6 @@ package com.example.technical_test.controller.impl;
 import com.example.technical_test.controller.PersonController;
 import com.example.technical_test.dto.PersonDataDto;
 import com.example.technical_test.dto.PersonNameWithIdDto;
-import com.example.technical_test.dto.PersonUpdateDto;
 import com.example.technical_test.service.PersonService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,9 +25,9 @@ public class PersonControllerImpl implements PersonController {
     }
 
     @Override
-    public PersonDataDto updatePersonById(@Valid PersonUpdateDto requestBody, Integer id) {
+    public PersonDataDto updatePersonById(@Valid PersonDataDto requestBody, Integer id) {
         log.info("HTTP request received: PUT /person/{} , {}", id, requestBody);
-        return personService.updatePersonById(requestBody, id);
+        return personService.updatePersonById(id, requestBody);
     }
 
     @Override
