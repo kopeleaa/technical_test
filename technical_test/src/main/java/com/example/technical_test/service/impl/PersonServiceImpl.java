@@ -51,8 +51,8 @@ public class PersonServiceImpl implements PersonService {
     @Override
     public PersonDataDto updatePersonById(PersonUpdateDto requestBody, Integer id) {
         Person person = personRepository.findById(id).orElseThrow(() -> new PersonNotFoundByIdException(id));
-        Address permAddress = addressService.getAddressById(requestBody.permanentAddressId());
-        Address tempAddress = addressService.getAddressById(requestBody.temporaryAddressId());
+        Address permAddress = addressService.findAddressById(requestBody.permanentAddressId());
+        Address tempAddress = addressService.findAddressById(requestBody.temporaryAddressId());
         ContactInformation phone = new ContactInformation();
         phone.setContactInformationValue(requestBody.phoneNumber());
         phone.setType(ContactInformationType.PHONE_NUMBER);
@@ -104,6 +104,10 @@ public class PersonServiceImpl implements PersonService {
                 .orElseThrow(() -> new PersonNotFoundByIdException(id));
 
         personRepository.delete(person);
+    }
+
+    public void savePerson(Person person) {
+        personRepository.save(person);
     }
 
     private Person getPersonFromRepoById(Integer id) {

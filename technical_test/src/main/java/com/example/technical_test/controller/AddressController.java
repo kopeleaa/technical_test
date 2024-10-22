@@ -2,10 +2,9 @@ package com.example.technical_test.controller;
 
 import com.example.technical_test.dto.AddressDto;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RequestMapping("/address")
 public interface AddressController {
@@ -14,6 +13,16 @@ public interface AddressController {
     @ResponseStatus(HttpStatus.CREATED)
     AddressDto createAddress(@RequestBody AddressDto requestBody);
 
+    @PutMapping("/{id}")
+    AddressDto updateAddress(@PathVariable Integer id, @RequestBody AddressDto requestBody);
 
+    @GetMapping("/{id}")
+    AddressDto getAddressById(@PathVariable Integer id);
+
+    @GetMapping
+    List<AddressDto> getAllAddresses();
+
+    @DeleteMapping("/{id}")
+    void deleteAddressById(@PathVariable Integer id);
 
 }

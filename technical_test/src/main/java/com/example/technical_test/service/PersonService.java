@@ -1,5 +1,6 @@
 package com.example.technical_test.service;
 
+import com.example.technical_test.domain.Person;
 import com.example.technical_test.dto.PersonDataDto;
 import com.example.technical_test.dto.PersonNameWithIdDto;
 import com.example.technical_test.dto.PersonUpdateDto;
@@ -16,4 +17,6 @@ public interface PersonService {
     List<PersonNameWithIdDto> getAllPersons();
 
     void deletePerson(Integer id);
+
+    void savePerson(Person person);
 }

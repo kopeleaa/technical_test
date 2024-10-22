@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @Slf4j
@@ -18,5 +20,29 @@ public class AddressControllerImpl implements AddressController {
     public AddressDto createAddress(AddressDto requestBody) {
         log.info("HTTP request received: POST /address {}", requestBody);
         return addressService.createAddress(requestBody);
+    }
+
+    @Override
+    public AddressDto updateAddress(Integer id, AddressDto requestBody) {
+        log.info("HTTP request received: PUT /address/{} {}", id, requestBody);
+        return addressService.updateAddress(id, requestBody);
+    }
+
+    @Override
+    public AddressDto getAddressById(Integer id) {
+        log.info("HTTP request received: GET /address/{}", id);
+        return addressService.getAddressById(id);
+    }
+
+    @Override
+    public List<AddressDto> getAllAddresses() {
+        log.info("HTTP request received: GET /address");
+        return addressService.getAllAddresses();
+    }
+
+    @Override
+    public void deleteAddressById(Integer id) {
+        log.info("HTTP request received: DELETE /address/{}", id);
+        addressService.deleteAddressById(id);
     }
 }
