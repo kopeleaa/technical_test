@@ -8,6 +8,7 @@ import lombok.ToString;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "person")
@@ -51,5 +52,18 @@ public class Person {
         if (!this.contactInformationList.contains(contactInformation)) {
             this.contactInformationList.add(contactInformation);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Person person = (Person) o;
+        return Objects.equals(id, person.id) && Objects.equals(firstName, person.firstName) && Objects.equals(lastName, person.lastName) && Objects.equals(dateOfBirth, person.dateOfBirth) && Objects.equals(permanentAddress, person.permanentAddress) && Objects.equals(temporaryAddress, person.temporaryAddress) && Objects.equals(contactInformationList, person.contactInformationList);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, firstName, lastName, dateOfBirth, permanentAddress, temporaryAddress, contactInformationList);
     }
 }

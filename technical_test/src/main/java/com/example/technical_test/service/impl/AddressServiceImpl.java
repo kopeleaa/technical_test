@@ -71,7 +71,10 @@ public class AddressServiceImpl implements AddressService {
     @Override
     public void deleteAddressById(Integer id) {
         Address addressFromRepo = deleteReferenceToAddress(findAddressById(id));
+        Person person = addressFromRepo.getPerson();
         addressFromRepo.setPerson(null);
+
+        personService.savePerson(person);
         addressRepository.delete(addressFromRepo);
     }
 
@@ -81,9 +84,11 @@ public class AddressServiceImpl implements AddressService {
         Address temporaryAddress = findAddressById(tempAddressId);
         Person personFromRepo = personService.findPersonFromRepoById(personId);
 
-        if (permanentAddress.getPerson() != null) {
+        if (permanentAddress.getPerson() != null && !permanentAddress.getPerson().equals(personFromRepo)) {
             throw new AddressAlreadyInUseException(permAddressId);
-        } else if (temporaryAddress.getPerson() != null) {
+        }
+
+        if (temporaryAddress.getPerson() != null && !temporaryAddress.getPerson().equals(personFromRepo)) {
             throw new AddressAlreadyInUseException(tempAddressId);
         }
 
@@ -118,17 +123,16 @@ public class AddressServiceImpl implements AddressService {
     private Address deleteReferenceToAddress(Address address) {
         Person person = address.getPerson();
 
-        if (person == null) {
-            return address;
-        } else if (address.equals(person.getPermanentAddress())) {
+        if (address.equals(person.getPermanentAddress())) {
             person.setPermanentAddress(null);
             personService.savePerson(person);
             return address;
-        } else {
+        } else if (address.equals(person.getTemporaryAddress())) {
             person.setTemporaryAddress(null);
             personService.savePerson(person);
             return address;
         }
+        return address;
     }
 
 
