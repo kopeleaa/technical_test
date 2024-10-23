@@ -32,10 +32,12 @@ public class Person {
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "permanent_address")
+    @ToString.Exclude
     private Address permanentAddress;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "temporary_address")
+    @ToString.Exclude
     private Address temporaryAddress;
 
 
