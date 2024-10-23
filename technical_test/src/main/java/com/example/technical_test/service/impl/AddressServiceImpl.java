@@ -88,17 +88,8 @@ public class AddressServiceImpl implements AddressService {
             Address currentPermanentAddress = personFromRepo.getPermanentAddress();
             Address currentTemporaryAddress = personFromRepo.getTemporaryAddress();
 
-            if (currentPermanentAddress != null) {
-                currentPermanentAddress.setPerson(null);
-                currentPermanentAddress.setAddressType(null);
-                addressRepository.save(currentPermanentAddress);
-            }
-
-            if (currentTemporaryAddress != null) {
-                currentTemporaryAddress.setPerson(null);
-                currentTemporaryAddress.setAddressType(null);
-                addressRepository.save(currentTemporaryAddress);
-            }
+            deletePersonReference(currentPermanentAddress);
+            deletePersonReference(currentTemporaryAddress);
 
 
             permanentAddress.setAddressType(AddressType.PERMANENT);
@@ -149,7 +140,13 @@ public class AddressServiceImpl implements AddressService {
         return address;
     }
 
-    private void deletePersonReference(Address)
+    private void deletePersonReference(Address address) {
+        if (address != null) {
+            address.setPerson(null);
+            address.setAddressType(null);
+            addressRepository.save(address);
+        }
+    }
 
 
 }
