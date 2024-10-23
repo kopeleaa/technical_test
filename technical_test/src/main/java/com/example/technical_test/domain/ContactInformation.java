@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Objects;
+
 @Entity
 @Table(name = "contact_information")
 @NoArgsConstructor
@@ -27,4 +29,17 @@ public class ContactInformation {
     @JoinColumn(name = "person_id", nullable = false)
     @JsonBackReference
     private Person person;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ContactInformation that = (ContactInformation) o;
+        return Objects.equals(contactInformationValue, that.contactInformationValue) && type == that.type;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(contactInformationValue, type);
+    }
 }

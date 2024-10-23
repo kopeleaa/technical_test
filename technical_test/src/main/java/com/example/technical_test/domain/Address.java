@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Table(name = "address")
@@ -29,9 +30,9 @@ public class Address {
     @Column(name = "house_number")
     private Integer houseNumber;
 
-    @ManyToOne
-    @JoinColumn(name = "person_id", nullable = false)
+    @OneToOne
     @JsonBackReference
+    @ToString.Exclude
     private Person person;
 
     @Enumerated(EnumType.STRING)
