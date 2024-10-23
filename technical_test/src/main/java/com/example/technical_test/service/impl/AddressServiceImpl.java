@@ -84,25 +84,39 @@ public class AddressServiceImpl implements AddressService {
         Address temporaryAddress = findAddressById(tempAddressId);
         Person personFromRepo = personService.findPersonFromRepoById(personId);
 
-        if (permanentAddress.getPerson() != null && !permanentAddress.getPerson().equals(personFromRepo)) {
-            throw new AddressAlreadyInUseException(permAddressId);
+        if (permanentAddress.getPerson() == null || temporaryAddress.getPerson() == null) {
+            Address currentPermanentAddress = personFromRepo.getPermanentAddress();
+            Address currentTemporaryAddress = personFromRepo.getTemporaryAddress();
+
+            if (currentPermanentAddress != null) {
+                currentPermanentAddress.setPerson(null);
+                currentPermanentAddress.setAddressType(null);
+                addressRepository.save(currentPermanentAddress);
+            }
+
+            if (currentTemporaryAddress != null) {
+                currentTemporaryAddress.setPerson(null);
+                currentTemporaryAddress.setAddressType(null);
+                addressRepository.save(currentTemporaryAddress);
+            }
+
+
+            permanentAddress.setAddressType(AddressType.PERMANENT);
+            permanentAddress.setPerson(personFromRepo);
+            temporaryAddress.setAddressType(AddressType.TEMPORARY);
+            temporaryAddress.setPerson(personFromRepo);
+
+            addressRepository.save(permanentAddress);
+            addressRepository.save(temporaryAddress);
+            personFromRepo.setPermanentAddress(permanentAddress);
+            personFromRepo.setTemporaryAddress(temporaryAddress);
+
+            personService.savePerson(personFromRepo);
         }
 
-        if (temporaryAddress.getPerson() != null && !temporaryAddress.getPerson().equals(personFromRepo)) {
-            throw new AddressAlreadyInUseException(tempAddressId);
-        }
+        // throw new AddressAlreadyInUseException(tempAddressId);
 
-        permanentAddress.setAddressType(AddressType.PERMANENT);
-        permanentAddress.setPerson(personFromRepo);
-        temporaryAddress.setAddressType(AddressType.TEMPORARY);
-        temporaryAddress.setPerson(personFromRepo);
 
-        addressRepository.save(permanentAddress);
-        addressRepository.save(temporaryAddress);
-        personFromRepo.setPermanentAddress(permanentAddress);
-        personFromRepo.setTemporaryAddress(temporaryAddress);
-
-        personService.savePerson(personFromRepo);
     }
 
     @Override
@@ -134,6 +148,8 @@ public class AddressServiceImpl implements AddressService {
         }
         return address;
     }
+
+    private void deletePersonReference(Address)
 
 
 }
