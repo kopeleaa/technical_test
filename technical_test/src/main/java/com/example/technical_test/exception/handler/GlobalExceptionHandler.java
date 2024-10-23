@@ -104,6 +104,14 @@ public class GlobalExceptionHandler {
         return validationError;
     }
 
+    @ExceptionHandler(AddressAlreadyInUseException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ValidationError handleAddressAlreadyInUseException(AddressAlreadyInUseException exception) {
+        ValidationError validationError = new ValidationError("id", exception.getMessage());
+        logValidationError(validationError.field(), validationError.errorMessage());
+        return validationError;
+    }
+
 
     private void logValidationError(String field, String message) {
         log.error(VALIDATION_ERROR_MESSAGE, field, message);

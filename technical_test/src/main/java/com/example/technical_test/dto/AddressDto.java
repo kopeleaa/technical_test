@@ -9,7 +9,6 @@ public record AddressDto(
         @NotNull String zipCode,
         @NotNull String city,
         @NotNull String street,
-        @NotNull Integer houseNumber,
-        @NotNull AddressType addressType
+        @NotNull Integer houseNumber
 ) {
 }

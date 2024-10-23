@@ -41,12 +41,14 @@ public class ContactInformationServiceImpl implements ContactInformationService 
 
     @Override
     public ContactInfoDto updateContactInformation(ContactUpdateDto requestBody) {
-        contactInformationRepository.findById(requestBody.contactInformationId())
+        ContactInformation contactInformation = contactInformationRepository.findById(requestBody.contactInformationId())
                 .orElseThrow(() -> new ContactInformationNotFoundByIdException(requestBody.contactInformationId()));
 
+        contactInformation.setContactInformationValue(requestBody.value());
+        Person person = contactInformation.getPerson();
+        personService.savePerson(person);
 
-
-        return null;
+        return contactInformationMapper.entityToDto(contactInformationRepository.save(contactInformation));
     }
 
     @Override

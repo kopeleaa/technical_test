@@ -10,7 +10,6 @@ public class AddressMapper {
     public Address dtoToEntity(AddressDto dto) {
         Address address = new Address();
 
-        address.setAddressType(dto.addressType());
         address.setZipCode(dto.zipCode());
         address.setCity(dto.city());
         address.setStreet(dto.street());
