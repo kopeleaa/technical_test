@@ -88,6 +88,22 @@ public class GlobalExceptionHandler {
         return validationError;
     }
 
+    @ExceptionHandler(ContactInformationAlreadyExistsException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ValidationError handleContactInformationAlreadyExistsException(ContactInformationAlreadyExistsException exception) {
+        ValidationError validationError = new ValidationError("value", exception.getMessage());
+        logValidationError(validationError.field(), validationError.errorMessage());
+        return validationError;
+    }
+
+    @ExceptionHandler(ContactInformationNotFoundByIdException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ValidationError handleContactInformationNotFoundByIdException(ContactInformationNotFoundByIdException exception) {
+        ValidationError validationError = new ValidationError("id", exception.getMessage());
+        logValidationError(validationError.field(), validationError.errorMessage());
+        return validationError;
+    }
+
 
     private void logValidationError(String field, String message) {
         log.error(VALIDATION_ERROR_MESSAGE, field, message);

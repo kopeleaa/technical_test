@@ -16,8 +16,13 @@ public class ContactInformationMapper {
     public ContactInformation dtoToEntity(ContactInfoDto dto) {
         ContactInformation contactInformation = new ContactInformation();
 
+        if (dto.value().contains("@")) {
+            contactInformation.setType(ContactInformationType.EMAIL_ADDRESS);
+        } else {
+            contactInformation.setType(ContactInformationType.PHONE_NUMBER);
+        }
+
         contactInformation.setContactInformationValue(dto.value());
-        contactInformation.setType(ContactInformationType.valueOf(dto.type()));
         contactInformation.setPerson(personService.findPersonFromRepoById(dto.personId()));
 
         return contactInformation;
@@ -26,7 +31,6 @@ public class ContactInformationMapper {
     public ContactInfoDto entityToDto(ContactInformation contactInformation) {
         return ContactInfoDto.builder()
                 .value(contactInformation.getContactInformationValue())
-                .type(contactInformation.getType().name())
                 .personId(contactInformation.getPerson().getId())
                 .build();
     }

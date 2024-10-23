@@ -5,7 +5,6 @@ import lombok.Builder;
 @Builder
 public record ContactInfoDto(
         String value,
-        String type,
         Integer personId
 ) {
 }
