@@ -12,7 +12,6 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "person")
-//@NoArgsConstructor
 @Data
 public class Person {
 
