@@ -1,11 +1,9 @@
 package com.example.technical_test.ServiceImpl;
 
-import com.example.technical_test.domain.Address;
 import com.example.technical_test.domain.Person;
 import com.example.technical_test.dto.PersonDataDto;
 import com.example.technical_test.dto.PersonNameWithIdDto;
 import com.example.technical_test.dto.mapper.PersonMapper;
-import com.example.technical_test.enums.AddressType;
 import com.example.technical_test.exception.NoEntriesFoundException;
 import com.example.technical_test.exception.PersonAlreadyExistsException;
 import com.example.technical_test.exception.PersonNotFoundByIdException;
@@ -19,7 +17,6 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -28,7 +25,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -74,6 +70,26 @@ class PersonServiceImplTest {
     }
 
     @Test
+    void givenNoPersonInDB_WhenUpdatePersonById_ThenExceptionThrown() {
+        PersonDataDto dto = returnMockPersonDataDto("Agatha", "Christie");
+
+        Mockito.when(personRepository.findById(any())).thenReturn(Optional.empty());
+        assertThrows(PersonNotFoundByIdException.class, ()-> personService.updatePersonById(1, dto));
+        verify(personRepository, atLeast(1)).findById(any());
+    }
+
+    @Test
+    void givenOnePersonInDB_WhenUpdatePersonById_ThenUpdatePerson() {
+        PersonDataDto dto = returnMockPersonDataDto("Agatha", "Christie");
+        Person person = returnMockPerson("Agatha", "Christie");
+
+        Mockito.when(personRepository.findById(any())).thenReturn(Optional.of(person));
+        personService.updatePersonById(1, dto);
+        verify(personRepository, atLeast(1)).save(person);
+    }
+
+
+    @Test
     void givenNoPersonInDB_WhenGetPersonById_ThenExceptionThrown() {
         Mockito.when(personRepository.findById(any())).thenReturn(Optional.empty());
         assertThrows(PersonNotFoundByIdException.class, () -> personService.findPersonFromRepoById(1));
@@ -115,21 +131,22 @@ class PersonServiceImplTest {
     void givenNoEntriesInDB_WhenGetAllPersons_ThenExceptionThrown() {
         List<Person> emptyList = Collections.emptyList();
         Mockito.when(personRepository.findAll()).thenReturn(emptyList);
+        assertEquals(0, personRepository.findAll().size());
         assertThrows(NoEntriesFoundException.class, () -> personService.getAllPersons());
     }
 
     @Test
     void givenNoPersonInDB_WhenDeletePerson_ThenExceptionThrown() {
-        Mockito.when(personRepository.findById(1)).thenThrow(PersonNotFoundByIdException.class);
+        Mockito.when(personRepository.findById(any())).thenReturn(Optional.empty());
         assertThrows(PersonNotFoundByIdException.class, () -> personService.deletePerson(1));
     }
 
     @Test
     void givenOnePersonInDB_WhenDeletePerson_ThenPersonDeleted() {
         Person person = returnMockPerson("Agatha", "Christie");
-        personRepository.delete(person);
+        Mockito.when(personRepository.findById(any())).thenReturn(Optional.of(person));
+        personService.deletePerson(any());
         verify(personRepository, times(1)).delete(person);
-        //argumentCaptor
     }
 
 
@@ -144,18 +161,6 @@ class PersonServiceImplTest {
         return person;
     }
 
-    private Address returnMockAddress(Person person, Integer id, AddressType type, String city) {
-        Address address = new Address();
-        address.setId(id);
-        address.setAddressType(type);
-        address.setCity(city);
-        address.setStreet("Apple");
-        address.setHouseNumber(12);
-        address.setZipCode("0123");
-        address.setPerson(person);
-
-        return address;
-    }
 
     private PersonDataDto returnMockPersonDataDto(String firstname, String lastName) {
         return
