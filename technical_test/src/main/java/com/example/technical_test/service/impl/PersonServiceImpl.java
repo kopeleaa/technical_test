@@ -37,7 +37,7 @@ public class PersonServiceImpl implements PersonService {
         person.setLastName(requestBody.lastName());
         person.setDateOfBirth(requestBody.dateOfBirth());
 
-        return personMapper.personNameWithIdDto(personRepository.save(person));
+        return personMapper.entityToPersonNameWithIdDto(personRepository.save(person));
     }
 
     @Override
@@ -54,7 +54,7 @@ public class PersonServiceImpl implements PersonService {
     @Override
     public PersonNameWithIdDto getPersonById(Integer id) {
         Person person = findPersonFromRepoById(id);
-        return personMapper.personNameWithIdDto(person);
+        return personMapper.entityToPersonNameWithIdDto(person);
     }
 
     @Override
@@ -65,7 +65,7 @@ public class PersonServiceImpl implements PersonService {
             throw new NoEntriesFoundException();
         }
 
-        return people.stream().map(personMapper::personNameWithIdDto)
+        return people.stream().map(personMapper::entityToPersonNameWithIdDto)
                 .toList();
     }
 

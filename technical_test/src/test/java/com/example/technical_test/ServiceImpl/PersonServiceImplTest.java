@@ -19,6 +19,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -48,14 +49,9 @@ class PersonServiceImplTest {
         PersonNameWithIdDto expectedDto = new PersonNameWithIdDto(1,
                 "Agatha Christie");
 
-        Mockito.when(personRepository.findByNameAndDateOfBirth(any(), any(), any()))
-                .thenReturn(Optional.empty());
-
-        Mockito.when(personMapper.personDataDtoToEntity(dto))
-                .thenReturn(new Person());
-
-        Mockito.when(personMapper.personNameWithIdDto(any()))
-                .thenReturn(expectedDto);
+        Mockito.when(personRepository.findByNameAndDateOfBirth(any(), any(), any())).thenReturn(Optional.empty());
+        Mockito.when(personMapper.personDataDtoToEntity(dto)).thenReturn(new Person());
+        Mockito.when(personMapper.entityToPersonNameWithIdDto(any())).thenReturn(expectedDto);
 
         PersonNameWithIdDto person2 = personService.createPerson(dto);
 
@@ -69,18 +65,21 @@ class PersonServiceImplTest {
         PersonDataDto dto = returnMockPersonDataDto("Agatha", "Christie");
         Person person = returnMockPerson("Agatha", "Christie");
 
-        assert dto != null;
-        Mockito.when(personRepository.findByNameAndDateOfBirth(dto.firstName(), dto.lastName(), dto.dateOfBirth()))
-                        .thenReturn(Optional.of(person));
+        Mockito.when(personRepository.findByNameAndDateOfBirth(any(), any(), any()))
+                .thenReturn(Optional.of(person));
+        Person person1 = personRepository.findByNameAndDateOfBirth(dto.firstName(), dto.lastName(), dto.dateOfBirth()).get();
 
-
+        assertEquals(person1, person);
         assertThrows(PersonAlreadyExistsException.class, () -> personService.createPerson(dto));
     }
 
     @Test
     void givenNoPersonInDB_WhenGetPersonById_ThenExceptionThrown() {
-        Mockito.when(personRepository.findById(1)).thenReturn(Optional.empty());
+        Mockito.when(personRepository.findById(any())).thenReturn(Optional.empty());
+        assertThrows(PersonNotFoundByIdException.class, () -> personService.findPersonFromRepoById(1));
         assertThrows(PersonNotFoundByIdException.class, () -> personService.getPersonById(1));
+
+        verify(personRepository, atLeast(1)).findById(any());
     }
 
     @Test
@@ -88,7 +87,8 @@ class PersonServiceImplTest {
         PersonNameWithIdDto dto = new PersonNameWithIdDto(1, "Ben Hur");
         Person person = returnMockPerson("Ben", "Hur");
 
-        Mockito.when(personRepository.findById(1)).thenReturn(Optional.of(person));
+        Mockito.when(personRepository.findById(any())).thenReturn(Optional.of(person));
+        Mockito.when(personMapper.entityToPersonNameWithIdDto(person)).thenReturn(dto);
         Mockito.when(personService.getPersonById(1)).thenReturn(dto);
         PersonNameWithIdDto personById = personService.getPersonById(1);
 
@@ -103,8 +103,7 @@ class PersonServiceImplTest {
         Person person2 = returnMockPerson("Frank", "Theodore");
 
         //When
-        given(personRepository.findAll())
-                .willReturn(List.of(person, person2));
+        Mockito.when(personRepository.findAll()).thenReturn(List.of(person, person2));
         List<PersonNameWithIdDto> personList = personService.getAllPersons();
 
         //Then
@@ -159,16 +158,11 @@ class PersonServiceImplTest {
     }
 
     private PersonDataDto returnMockPersonDataDto(String firstname, String lastName) {
-        return null;
-        /*new PersonDataDto(
-                firstname,
-                lastName,
-                LocalDate.of(1890, 9, 15),
-                1,
-                2,
-                "06203345678",
-                "test@test.com");
+        return
+                new PersonDataDto(
+                        firstname,
+                        lastName,
+                        LocalDate.of(1890, 9, 15));
 
-         */
     }
 }
