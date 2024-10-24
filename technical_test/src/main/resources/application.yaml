@@ -2,18 +2,17 @@ spring:
   application:
     name: technical_test
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    password: test1234
-    url: jdbc:mysql://localhost:3306/technical_test?createDatabaseIfNotExist=true&serverTimezone=UTC
-    username: root
+    url: jdbc:sqlserver://localhost:1433;databaseName=technical_test;createDatabaseIfNotExist=true;encrypt=true;trustServerCertificate=true;
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    username: sa
+    password: yourStrong(!)Password
   jpa:
-      hibernate:
-        ddl-auto: update
-      open-in-view: false
-      properties:
-        hibernate:
-          format_sql: true
-          show_sql: true
+    show-sql: true
+    #    properties:
+    hibernate:
+      ddl-auto: update
+    properties:
+      dialect: org.hibernate.dialect.SQLServerDialect
 logging:
     level:
       root: INFO

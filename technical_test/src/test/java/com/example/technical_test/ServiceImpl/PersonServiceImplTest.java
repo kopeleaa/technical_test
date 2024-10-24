@@ -26,9 +26,9 @@ import java.util.Optional;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class PersonServiceImplTest {
@@ -48,8 +48,18 @@ class PersonServiceImplTest {
         PersonNameWithIdDto expectedDto = new PersonNameWithIdDto(1,
                 "Agatha Christie");
 
-        Mockito.when(personService.createPerson(dto)).thenReturn(expectedDto);
+        Mockito.when(personRepository.findByNameAndDateOfBirth(any(), any(), any()))
+                .thenReturn(Optional.empty());
+
+        Mockito.when(personMapper.personDataDtoToEntity(dto))
+                .thenReturn(new Person());
+
+        Mockito.when(personMapper.personNameWithIdDto(any()))
+                .thenReturn(expectedDto);
+
         PersonNameWithIdDto person2 = personService.createPerson(dto);
+
+        verify(personRepository, atLeast(1)).save(any());
 
         assertEquals(person2.name(), dto.firstName() + " " + dto.lastName());
     }
@@ -59,8 +69,11 @@ class PersonServiceImplTest {
         PersonDataDto dto = returnMockPersonDataDto("Agatha", "Christie");
         Person person = returnMockPerson("Agatha", "Christie");
 
-        Mockito.when(personRepository.findByNameAndDateOfBirth(
-                dto.firstName(), dto.lastName(), dto.dateOfBirth())).thenReturn(Optional.of(person));
+        assert dto != null;
+        Mockito.when(personRepository.findByNameAndDateOfBirth(dto.firstName(), dto.lastName(), dto.dateOfBirth()))
+                        .thenReturn(Optional.of(person));
+
+
         assertThrows(PersonAlreadyExistsException.class, () -> personService.createPerson(dto));
     }
 
