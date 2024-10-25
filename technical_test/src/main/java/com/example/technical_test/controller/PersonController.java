@@ -16,14 +16,18 @@ public interface PersonController {
     PersonNameWithIdDto createPerson(@Valid @RequestBody PersonDataDto requestBody);
 
     @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
     PersonDataDto updatePersonById(@RequestBody @Valid PersonDataDto requestBody, @PathVariable Integer id);
 
     @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
     PersonNameWithIdDto getPersonById(@PathVariable Integer id);
 
     @GetMapping
+    @ResponseStatus(HttpStatus.OK)
     List<PersonNameWithIdDto> getAllPersons();
 
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
     void deletePerson(@PathVariable Integer id);
 }

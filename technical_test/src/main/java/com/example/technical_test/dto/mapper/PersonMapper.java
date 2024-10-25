@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 public class PersonMapper {
 
 
-    public PersonNameWithIdDto personNameWithIdDto(Person person) {
+    public PersonNameWithIdDto entityToPersonNameWithIdDto(Person person) {
         return PersonNameWithIdDto.builder()
                 .personId(person.getId())
                 .name(person.getFirstName() + " " + person.getLastName())
