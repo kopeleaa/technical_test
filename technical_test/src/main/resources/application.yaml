@@ -8,7 +8,6 @@ spring:
     password: yourStrong(!)Password
   jpa:
     show-sql: true
-    #    properties:
     hibernate:
       ddl-auto: update
     properties:
@@ -16,4 +15,7 @@ spring:
 logging:
     level:
       root: INFO
+
+
+
 
