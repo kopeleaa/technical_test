@@ -35,9 +35,9 @@ class TechnicalTestApplicationTests {
     void givenNoPersonInDB_WhenCreatePerson_ThenPersonCreated() throws Exception {
         String requestBody = """
                         {
-                         "firstName": "Agatha",
-                         "lastName": "Christie",
-                         "dateOfBirth" : "1890-09-15"
+                         "firstName":"Agatha",
+                         "lastName":"Christie",
+                         "dateOfBirth":"1890-09-15"
                         }
                 """;
 
@@ -45,11 +45,8 @@ class TechnicalTestApplicationTests {
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(requestBody))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.firstName", is("Agatha")))
-                .andExpect(jsonPath("$.lastName", is("Christie")))
-                .andExpect(jsonPath("$.dateOfBirth", is("1890-9-15")));
-
-
+                .andExpect(jsonPath("$.personId", is(1)))
+                .andExpect(jsonPath("$.name", is("Agatha Christie")));
     }
 
 

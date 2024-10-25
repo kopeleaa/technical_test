@@ -5,6 +5,7 @@ import com.example.technical_test.domain.Person;
 import com.example.technical_test.dto.ContactInfoDto;
 import com.example.technical_test.dto.mapper.ContactInformationMapper;
 import com.example.technical_test.enums.ContactInformationType;
+import com.example.technical_test.exception.ContactInformationAlreadyExistsException;
 import com.example.technical_test.repository.ContactInformationRepository;
 import com.example.technical_test.repository.PersonRepository;
 import com.example.technical_test.service.impl.ContactInformationServiceImpl;
@@ -14,18 +15,18 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.atLeast;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class ContactInformationServiceImplTest {
+class ContactInformationServiceImplTest {
 
     @Mock
     private ContactInformationRepository contactInformationRepository;
@@ -42,28 +43,55 @@ public class ContactInformationServiceImplTest {
     @InjectMocks
     private ContactInformationServiceImpl contactInformationService;
 
-    private static final String PHONE_NUMBER = "06205678912";
-    private static final String EMAIL = "test@test.com";
+    private static final String PHONE_NUMBER_VALUE = "06205678912";
 
 
     @Test
     void givenNoContactInformationInDB_WhenCreateContactInformation_ThenContactInformationCreated() {
-        ContactInfoDto contactInfoDto = returnContactInfoDto(PHONE_NUMBER);
+        ContactInfoDto contactInfoDto = returnContactInfoDto(PHONE_NUMBER_VALUE);
         ContactInformation contactInformation = new ContactInformation();
         contactInformation.setType(ContactInformationType.PHONE_NUMBER);
-        contactInformation.setContactInformationValue(PHONE_NUMBER);
+        contactInformation.setContactInformationValue(PHONE_NUMBER_VALUE);
 
-        Person person = returnMockPerson("Agatha", "Christie");
-        Mockito.when(contactInformationMapper.dtoToEntity(contactInfoDto)).thenReturn(contactInformation);
+        Person person = returnPerson("Agatha", "Christie");
+        contactInformation.setPerson(person);
+        when(contactInformationMapper.dtoToEntity(contactInfoDto)).thenReturn(contactInformation);
 
         person.addContactInformation(contactInformation);
+        contactInformationService.createContactInformation(contactInfoDto);
 
-        ArgumentCaptor<ContactInformation> argument = ArgumentCaptor.forClass(ContactInformation.class);
-        verify(person).addContactInformation(argument.capture());
-        assertEquals("06205678912", argument.getValue().getContactInformationValue());
+        ArgumentCaptor<ContactInformation> ctiCaptor = ArgumentCaptor.forClass(ContactInformation.class);
+        verify(contactInformationRepository).save(ctiCaptor.capture());
+        ContactInformation contactInformation1 = ctiCaptor.getValue();
+        assertEquals(person, contactInformation1.getPerson());
+        assertEquals(contactInformation.getType(), contactInformation1.getType());
+        assertEquals(contactInformation.getContactInformationValue(),
+                contactInformation1.getContactInformationValue());
 
-        verify(personRepository, atLeast(1)).save(any());
+
+        ArgumentCaptor<Person> argument = ArgumentCaptor.forClass(Person.class);
+        verify(personService).savePerson(argument.capture());
+        Person person1 = argument.getValue();
+        assertEquals(person.getContactInformationList(), person1.getContactInformationList());
+
+        verify(personService, atLeast(1)).savePerson(any());
         verify(contactInformationRepository, atLeast(1)).save(any());
+    }
+
+    @Test
+    void givenContactInformationAlreadyExists_WhenCreateContactInformation_ThenExceptionThrown() {
+        ContactInfoDto dto = returnContactInfoDto(PHONE_NUMBER_VALUE);
+        ContactInformation cti = new ContactInformation();
+        cti.setType(ContactInformationType.PHONE_NUMBER);
+        cti.setContactInformationValue(PHONE_NUMBER_VALUE);
+        Person person = returnPerson("Agatha", "Christie");
+        cti.setPerson(person);
+        contactInformationRepository.save(cti);
+        when(contactInformationMapper.dtoToEntity(dto)).thenReturn(cti);
+        when(contactInformationRepository.save(cti)).thenThrow(DataIntegrityViolationException.class);
+
+        assertThrows(ContactInformationAlreadyExistsException.class,
+                () -> contactInformationService.createContactInformation(dto));
     }
 
 
@@ -71,22 +99,13 @@ public class ContactInformationServiceImplTest {
         return new ContactInfoDto(value, 1);
     }
 
-    private ContactInformation returnMockContactInformation(String value, String type) {
-        ContactInformation contactInformation = new ContactInformation();
-        contactInformation.setContactInformationValue(value);
-        contactInformation.setType(ContactInformationType.valueOf(type));
 
-        return contactInformation;
-    }
-
-
-    private Person returnMockPerson(String firstName, String lastname) {
+    private Person returnPerson(String firstName, String lastname) {
         Person person = new Person();
 
         person.setFirstName(firstName);
         person.setLastName(lastname);
         person.setDateOfBirth(LocalDate.of(1890, 9, 15));
-        person.setId(1);
 
         return person;
     }
